@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contoh Tabel dengan Manipulasi DOM</title>
+    <link rel="stylesheet" href="Quiz.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+            transition: background-color 0.3s;
+            overflow: hidden; /* Menghindari scrollbar muncul saat animasi */
+        }
+
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1.4em;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        table, th, td {
+            border: 2px solid black;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4f65b3;
+        }
+
+        .move {
+            animation: moveRow 0.5s forwards;
+        }
+
+        @keyframes moveRow {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Animasi untuk hujan angka */
+        .code-rain {
+            position: absolute;
+            top: 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2em;
+            color: green;
+            animation: fall 3s linear infinite;
+            z-index: 1000;
+        }
+
+        @keyframes fall {
+            0% {
+                top: -10%;
+            }
+            100% {
+                top: 110%;
+            }
+        }
+
+        /* Animasi untuk ikan */
+        .fish {
+            position: absolute;
+            bottom: 10%;
+            width: 50px;
+            height: 30px;
+            background-color: orange;
+            clip-path: polygon(0 50%, 100% 0, 100% 100%);
+            animation: swim 4s linear infinite;
+        }
+
+        @keyframes swim {
+            0% {
+                transform: translateX(-100vw) scaleX(1);
+            }
+            50% {
+                transform: translateX(100vw) scaleX(-1);
+            }
+            100% {
+                transform: translateX(-100vw) scaleX(1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Usia</th>
+                <th>Tanggal Lahir</th>
+                <th>Prodi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Gizza</td>
+                <td>19</td>
+                <td>Depok</td>
+                <td>Sistem Informasi Kelautan</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Nadila</td>
+                <td>20</td>
+                <td>Serang</td>
+                <td>Informatika</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Linda</td>
+                <td>20</td>
+                <td>Brebes</td>
+                <td>Oseanografi</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Khansa</td>
+                <td>20</td>
+                <td>Lampung</td>
+                <td>Biologi Laut</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Bonita</td>
+                <td>19</td>
+                <td>Bogor</td>
+                <td>Logistik Kelautan</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Ambil semua sel di kolom Prodi
+        const prodiCells = document.querySelectorAll('#myTable tbody td:nth-child(5)');
+        let clickCount = 0;
+
+        // Tambahkan event listener untuk setiap sel di kolom Prodi
+        prodiCells.forEach(cell => {
+            cell.addEventListener('click', function(event) {
+                this.parentElement.classList.add('move');
+                
+                if (this.textContent === 'Sistem Informasi Kelautan') {
+                    document.body.style.backgroundColor = 'blue'; // Ubah latar belakang menjadi biru
+                }
+                // Cek jika isi sel adalah 'Informatika'
+                if (this.textContent === 'Informatika') {
+                    clickCount++;
+                    if (clickCount === 2) {
+                        createCodeRain(); // Panggil fungsi hujan angka
+                        clickCount = 0;
+                    }
+                }
+                if (this.textContent === 'Logistik Kelautan') {
+                    document.getElementById('myTable').classList.toggle('table-3d');
+                }
+                if (this.textContent === 'Biologi Laut') {
+                    createFish();
+                }
+            });
+
+            cell.addEventListener('click', function(event) {
+                if (this.textContent === 'Oseanografi') {
+                    clickCount++;
+                    if (clickCount === 3) {
+                        document.body.style.backgroundColor = 'skyblue';
+                        createRain();
+                        createSmallFishes(); // Panggil fungsi untuk ikan kecil
+                        clickCount = 0;
+                    }
+                }
+            });
+        });
+
+        function createCodeRain() {
+            for (let i = 0; i < 50; i++) { // Membuat 50 angka jatuh
+                const code = document.createElement('div');
+                code.className = 'code-rain';
+                code.textContent = Math.floor(Math.random() * 10); // Angka acak 0-9
+                code.style.left = `${Math.random() * 100}vw`; // Posisi horizontal acak
+                code.style.animationDuration = `${Math.random() * 2 + 1}s`; // Durasi jatuh acak
+                document.body.appendChild(code);
+
+                // Hapus angka setelah animasi selesai
+                setTimeout(() => {
+                    code.remove();
+                }, 3000);
+            }
+        }
+
+        function createStar() {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = `${Math.random() * 80}vw`;
+            document.body.appendChild(star);
+            
+            setTimeout(() => {
+                star.remove();
+            }, 1000);
+        }
+
+        function createRain() {
+            for (let i = 0; i < 100; i++) {
+                const raindrop = document.createElement('div');
+                raindrop.className = 'raindrop';
+                raindrop.style.left = `${Math.random() * 100}vw`;
+                raindrop.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+                document.body.appendChild(raindrop);
+                
+                setTimeout(() => {
+                    raindrop.remove();
+                }, 2000);
+            }
+        }
+
+        function createFish() {
+            const fish = document.createElement('div');
+            fish.className = 'fish';
+            fish.style.left = '0';
+            document.body.appendChild(fish);
+            
+            fish.style.animation = 'swim 2s forwards';
+        }
+
+        function createSmallFishes() {
+            for (let i = 0; i < 10; i++) { // Membuat 10 ikan kecil
+                const fish = document.createElement('div');
+                fish.className = 'fish';
+                fish.style.left = `${Math.random() > 0.5 ? '-50px' : '100vw'}`; // Posisi mulai dari kiri atau kanan
+                fish.style.bottom = `${Math.random() * 80}vh`; // Posisi vertikal acak
+                fish.style.animationDuration = `${Math.random() * 3 + 2}s`; // Durasi berenang acak
+                fish.style.animationDirection = Math.random() > 0.5 ? 'normal' : 'reverse'; // Arah berenang acak
+                document.body.appendChild(fish);
+
+                // Hapus ikan setelah animasi selesai
+                setTimeout(() => {
+                    fish.remove();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
